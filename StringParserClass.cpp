@@ -7,57 +7,61 @@
 
 #include <string>
 #include <string.h>
+#include <iostream>
+#include <cstring>
 #include "../327_proj3_test/includes/StringParserClass.h"
 #include "../327_proj3_test/includes/constants.h"
 
-class StringParserClass
-	{
-	public:
+KP_StringParserClass::StringParserClass::StringParserClass(): pStartTag(0), pEndTag(0), areTagsSet(false) { }
 
-		//dont forget to initialize member variables
-		StringParserClass(void) {
+KP_StringParserClass::StringParserClass::~StringParserClass() {
+	cleanup();
+}
 
-		}
+int KP_StringParserClass::StringParserClass::setTags(const char *pStart, const char *pEnd) {
+	if (pStart != NULL || pEnd != NULL) {
+		pStartTag = (char*)pStart;
+		pEndTag = (char*)pEnd;
+		areTagsSet = true;
+		return SUCCESS;
+	}
+	return ERROR_TAGS_NULL;
+}
 
-		//call cleanup to release any allocated memory
-		virtual ~StringParserClass(void) {
+int KP_StringParserClass::StringParserClass::getDataBetweenTags(char *pDataToSearchThru, std::vector<std::string> &myVector) {
+	if (pStartTag == NULL || pEndTag == NULL)
+		return ERROR_TAGS_NULL;
+	if (pDataToSearchThru == NULL)
+		return ERROR_DATA_NULL;
+ 	myVector.clear();
+ 	std::string temp = std::string(pDataToSearchThru);
+ 	while (temp.find(pStartTag) != std::string::npos && temp.find(pEndTag) != std::string::npos) {
+ 		std::cout << "\tOriginal: " << temp << '\n';
+ 		int start = temp.find(pStartTag);
+ 		int end = temp.find(pEndTag);
+ 		myVector.push_back(temp.substr(start + (int)std::strlen(pStartTag), end - start - (int)std::strlen(pEndTag) + 1));
+ 		temp.erase(start, (end - start) + (int)strlen(pEndTag));
+ 		std::cout << "\tNew: " << myVector[0] << " \t Current String Left: " << temp << '\n';
+ 	}
+ 	for (int i = 0; i < myVector.size(); i++) {
+ 		std::cout << myVector[i] << std::endl;
+ 	}
+ 	free(pDataToSearchThru);
+	return SUCCESS;
+}
 
-		}
+void KP_StringParserClass::StringParserClass::cleanup() {
+	if(pStartTag) {
+		delete [] pStartTag;
+	}
+	pStartTag = 0;
+	if(pEndTag) {
+		delete [] pEndTag;
+	}
+	pEndTag = 0;
+	areTagsSet = false;
+}
 
-		//these are the start tag and the end tags that we want to find,
-		//presumably the data of interest is between them, please make a
-		//COPY of what pStartTag and pEndTag point to.  In other words
-		//DO NOT SET pStartTag = pStart
-		//returns:
-		//SUCCESS
-		//ERROR_TAGS_NULL if either pStart or pEnd is null
-		int setTags(const char *pStart, const char *pEnd) {
-
-		}
-
-		//First clears myVector
-		//going to search thru pDataToSearchThru, looking for info bracketed by
-		//pStartTag and pEndTag, will add that info only to myVector
-		//returns
-		//SUCCESS  finished searching for data between tags, results in myVector (0 or more entries)
-		//ERROR_TAGS_NULL if either pStart or pEnd is null
-		//ERROR_DATA_NULL pDataToSearchThru is null
-		int getDataBetweenTags(char *pDataToSearchThru, std::vector<std::string> &myVector) {
-			return 0;
-		}
-
-	private:
-		void cleanup() {
-
-		}
-
-		//Searches a string starting at pStart for pTagToLookFor
-		//returns:
-		//SUCCESS  found pTagToLookFor, pStart points to beginning of tag and pEnd points to end of tag
-		//FAIL did not find pTagToLookFor and pEnd points to 0
-		//ERROR_TAGS_NULL if either pStart or pEnd is null
-		int findTag(char *pTagToLookFor, char *&pStart, char *&pEnd) {
-
-		}
-	};
-
+int KP_StringParserClass::StringParserClass::findTag(char *pTagToLookFor, char *&pStart, char *&pEnd) {
+	return SUCCESS;
+}
